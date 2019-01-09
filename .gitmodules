@@ -1,0 +1,3 @@
+[submodule "Population/lsd-modules/pop"]
+	path = Population/lsd-modules/pop
+	url = https://github.com/FrederikSchaff/lsd-module-pop.git

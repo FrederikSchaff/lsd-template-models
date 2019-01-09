@@ -21,7 +21,7 @@
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     Not doc yet at this pos.
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-#include "lsd-modules/validate/validate.h"
+#include "lsd-modules/debug-tools/validate.h"
 #ifndef SWITCH_PAJEK_OFF
   #include "lsd-modules/PajekFromCppFixVer/PajekFromCpp_head.h" //before backend!
 #endif

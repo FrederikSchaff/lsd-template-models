@@ -1,0 +1,26 @@
+Population Dynamics Template Model
+
+This is an explicit use case of the lsd population module you may access here:
+https://github.com/FrederikSchaff/lsd-module-pop
+
+it works with LSD-GIS, which you can get here:
+https://github.com/marcov64/Lsd/tree/GIS-beta
+
+Objective: This is a template model, to be used as a starting point for LSD
+models where an explicit population model is wanted that includes a heritage
+network that survives the agents and allows, for example, to check family
+degrees.
+
+In addition, it is easy to add statistical population models. Currently one
+model is added, called "BLL", following:
+
+  Boucekkine, Raouf; La Croix, David de; Licandro, Omar (2002):
+  Vintage Human Capital, Demographic Trends, and Endogenous Growth.
+  In Journal of Economic Theory 104 (2), pp. 340–375.
+  DOI: 10.1006/jeth.2001.2854.
+
+For information on how the back-end works, please take a look at the (yet
+scarce, I admit) documentation of the population module.
+
+(PRESS CTRL+E TO EDIT USER EQUATIONS)
+

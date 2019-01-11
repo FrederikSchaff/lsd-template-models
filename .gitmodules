@@ -1,3 +1,9 @@
 [submodule "Population/lsd-modules/pop"]
 	path = Population/lsd-modules/pop
 	url = https://github.com/FrederikSchaff/lsd-module-pop.git
+[submodule "Population/lsd-modules/PajekFromCpp"]
+	path = Population/lsd-modules/PajekFromCpp
+	url = https://github.com/FrederikSchaff/PajekFromCpp.git
+[submodule "Population/lsd-modules/debug-tools"]
+	path = Population/lsd-modules/debug-tools
+	url = https://github.com/FrederikSchaff/lsd_debug-tools.git

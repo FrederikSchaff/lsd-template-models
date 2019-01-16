@@ -7,3 +7,6 @@
 [submodule "Population/lsd-modules/debug-tools"]
 	path = Population/lsd-modules/debug-tools
 	url = https://github.com/FrederikSchaff/lsd_debug-tools.git
+[submodule "Pajek_Schelling/lsd-modules/PajekFromCpp"]
+	path = Pajek_Schelling/lsd-modules/PajekFromCpp
+	url = https://github.com/FrederikSchaff/PajekFromCpp.git

@@ -1,0 +1,3 @@
+Pajek example using Schelling Segregation Model (2d)
+1.1
+16 January, 2018

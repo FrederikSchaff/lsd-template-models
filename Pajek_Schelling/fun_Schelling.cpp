@@ -42,7 +42,7 @@ The Scheduler controls the updating scheme (that part which is not endogeneously
   }
   #endif
 
-  CYCLE(cur,"Agent"){
+  CYCLE(cur,"Agent"){ //see above: Randomise controls randomness
     cur1 = SEARCH_POSITIONS(cur,"Patch");
     bool has_moved = ( VS(cur,"Move") > 0.0 );
     #ifdef PAJEK
@@ -114,7 +114,7 @@ Initialise the model
   //Add agents to random position
 
     object *cAgent = SEARCH("Agent");
-    CYCLE_GIS_RNDS(SEARCH("Patch"),cur,"Patch"){
+    FCYCLE_GISS(SEARCH("Patch"),cur,"Patch"){
       ADD_TO_SPACE_SHARES(cAgent,cur); //Register cAgent at pos of cur Patch
       //prepare next
       cAgent = cAgent->next;
@@ -126,7 +126,7 @@ Initialise the model
   	//colour the agents in random order
   	double nAgentsBlue = nAgents * V("fracBlue");
   	i = 0;
-  	CYCLE_GIS_RNDS(SEARCH("Agent"),cur,"Agent"){
+  	RCYCLE_GISS(SEARCH("Agent"),cur,"Agent"){
   		i++; //increase by 1
   		if (i <= nAgentsBlue) {
   			WRITES(cur,"Colour",5); //blue
@@ -188,7 +188,7 @@ EQUATION("isOption")
       double callerColour = VS(c,"Colour");
       double fracOther = 0.0;
       double nNeighbours = 0.0; //A function for neighbourhood statistics would be good
-      CYCLE_NEIGHBOUR(cur,"Agent",VS(p->up,"distance")){
+     	FCYCLE_NEIGHBOUR(cur,"Agent",VS(p->up,"distance")){
         if (cur == c){
           continue; //skip self
         }
@@ -268,7 +268,7 @@ Measures the fraction of people in the neighbourhood that differ from ones own c
   double ownColour = V("Colour");
   double fracOther = 0.0;
   double nNeighbours = 0.0; //A function for neighbourhood statistics would be good
-  CYCLE_NEIGHBOUR(cur,"Agent",VS(p->up,"distance")){
+  FCYCLE_NEIGHBOUR(cur,"Agent",VS(p->up,"distance")){
   	if (VS(cur,"Colour")!=ownColour){
   		fracOther++;
   	}
@@ -311,7 +311,7 @@ EQUATION("EndOfSim")
     #ifndef NO_WINDOW
     if (V("lattice")>0){
       if (COUNT("Model")==1){
-        CYCLE_GIS_RNDS(SEARCH("Patch"),cur,"Patch"){ //Update whole lattice
+        FCYCLE_GISS(SEARCH("Patch"),cur,"Patch"){ //Update whole lattice
           cur1 = SEARCH_POSITIONS(cur,"Agent");
           if (cur1 == NULL)
             WRITE_LAT_GISS(cur,1000); //free
@@ -390,7 +390,7 @@ Note: The distance for the measurement is different from that of the agents
     }
     loc_diss = 0.0;
     //for each agent, calculate the local dissimilarity index
-    CYCLE_NEIGHBOURS(cur, cur1, "Agent", neighbDist ) {
+    FCYCLE_NEIGHBOURS(cur, cur1, "Agent", neighbDist ) {
       loc_n++;
       if ( VS(cur1,"Colour") == 5.0 ){
         loc_b++;

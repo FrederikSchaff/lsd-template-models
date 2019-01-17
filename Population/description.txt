@@ -11,13 +11,24 @@ models where an explicit population model is wanted that includes a heritage
 network that survives the agents and allows, for example, to check family
 degrees.
 
-In addition, it is easy to add statistical population models. Currently one
+The model allows to add statistical population models. Currently one
 model is added, called "BLL", following:
 
   Boucekkine, Raouf; La Croix, David de; Licandro, Omar (2002):
   Vintage Human Capital, Demographic Trends, and Endogenous Growth.
   In Journal of Economic Theory 104 (2), pp. 340–375.
   DOI: 10.1006/jeth.2001.2854.
+  
+In addition, a partner model can be included.
+
+Model def: 
+f_min_w
+f_max_w
+f_min_f
+f_max_f
+
+default model: Randomly select f.
+If matched, select prior m partner. Else select random m and match.
 
 For information on how the back-end works, please take a look at the (yet
 scarce, I admit) documentation of the population module.

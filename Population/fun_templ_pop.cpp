@@ -96,9 +96,6 @@ TRACK_SEQUENCE
   }
   //END: Test new population module
 
-  #ifdef ABMAT_USE_ANALYSIS
-    V("ABMAT_UPDATE"); //Take descriptive statistics
-  #endif
 RESULT(0.0)
 
 ////////////////////////
@@ -110,10 +107,10 @@ necessary. */
   int n_generation = 0;
 
   if (model_type == 1){
-  INIT_POPULATION_MODULE("BLL", 0.0,  1.0, V("m1_alpha"), V("m1_beta"));
+  INIT_POPULATION_MODULE("BLL", 0.0,  1.0, 0.5, V("m1_alpha"), V("m1_beta")); //Model, t_start, t_unit, femaleRatio, par1, par2
   n_generation = POP_CONSTN_BIRTH(V("Pop_const_n")); //size of the first generation
   } else {
-  INIT_POPULATION_MODULE("NONE", 0.0,  1.0);
+  INIT_POPULATION_MODULE("NONE", 0.0,  1.0, 0.5); //Model, t_start, t_unit, femaleRatio
   n_generation = V("Pop_const_n")/V("m0_maxLife")*2;
   }
 
@@ -123,9 +120,6 @@ necessary. */
   }
   DELETE(to_delete);
 
-  #ifdef ABMAT_USE_ANALYSIS
-    V("ABMAT_INIT"); //Initialise ABMAT
-  #endif
 PARAMETER
 RESULT(0)
 
@@ -189,7 +183,7 @@ RESULT(0.0)
 EQUATION("Pop_birth")
 /* Add next generation.*/
 TRACK_SEQUENCE
-  int model_type = V("Model_Type"); //allow testing different models.
+  int model_type = V("Model_Type"); //e.g., 1 == BLL
   int n_generation=0;
   if (model_type == 1){
     n_generation = POP_CONSTN_BIRTH(V("Pop_const_n")); //size of the first generation

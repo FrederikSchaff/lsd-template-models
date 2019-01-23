@@ -18,19 +18,50 @@ Label Root
 	Label Agent
 	{
 		Param: ID
-		Param: age
-		Param: female
+		Var: age
+		Var: female
 		Param: death_age
 		Param: father
 		Param: mother
 		Func: Death
+		Var: Init_Agent
+		Func: Relevant_Other
+		Var: psearch_radius
+		Var: age_accept_low
+		Var: age_accept_high
+		Var: age_influence
+		Var: Social_Pressure
+		Var: Partner_Status
+		Func: Potential_Partner
+		Param: PartnerID
+		Param: ro_a_high
+		Param: ro_a_low
+
+	}
+
+	Son: Settings
+	Label Settings
+	{
+		Param: fertility_low
+		Param: fertility_high
+		Param: wr_gamma
+		Param: alpha_WR
+		Param: beta_WR
+		Param: c_WR
+		Param: distance_wd
+		Param: fertility_f_high
+		Param: fertility_f_low
+		Param: fertility_m_high
+		Param: fertility_m_low
+		Param: rho_WD
+		Param: WD_alt_model
+		Param: wr_hintvl
 
 	}
 
 	Var: Updating_Scheme
 	Param: SA_
 	Func: Delete_Agent
-	Func: New_Agent
 	Var: Init_Global
 
 }
@@ -42,7 +73,6 @@ Object: Root C	1
 Var: Updating_Scheme 0 n + n n
 Param: SA_ 0 n + n n	0
 Func: Delete_Agent 0 n + n n
-Func: New_Agent 0 n + n n
 Var: Init_Global 0 n + n n
 
 Object: Pop_Model C	1
@@ -50,18 +80,46 @@ Var: Pop_age 0 s + n p
 Var: Pop_birth 0 s + n n
 Param: m1_alpha 0 n + n n	5.44
 Param: m1_beta 0 n + n n	-0.014729
-Param: Pop_const_n 0 s + n n	2000
+Param: Pop_const_n 0 s + n n	200
 Param: Model_Type 0 n + n n	1
 Param: m0_maxLife 0 n + n n	100
 
 Object: Agent C	1
 Param: ID 0 n + n n	0
-Param: age 0 s + n n	0
-Param: female 0 s + n n	0
+Var: age 0 s + n n
+Var: female 0 s + n n
 Param: death_age 0 s + n n	0
 Param: father 0 n + n n	-1
 Param: mother 0 n + n n	-1
 Func: Death 0 n + n n
+Var: Init_Agent 0 n + n n
+Func: Relevant_Other 0 n + n n
+Var: psearch_radius 0 n + n n
+Var: age_accept_low 0 n + n n
+Var: age_accept_high 0 n + n n
+Var: age_influence 0 n + n n
+Var: Social_Pressure 0 n + n n
+Var: Partner_Status 0 n + n n
+Func: Potential_Partner 0 n + n n
+Param: PartnerID 0 n + n n	0
+Param: ro_a_high 0 n + n n	0
+Param: ro_a_low 0 n + n n	0
+
+Object: Settings C	1
+Param: fertility_low 0 n + n n	15
+Param: fertility_high 0 n + n n	35
+Param: wr_gamma 0 n + n n	2
+Param: alpha_WR 0 n + n n	0.5
+Param: beta_WR 0 n + n n	7
+Param: c_WR 0 n + n n	25
+Param: distance_wd 0 n + n n	1
+Param: fertility_f_high 0 n + n n	45
+Param: fertility_f_low 0 n + n n	15
+Param: fertility_m_high 0 n + n n	65
+Param: fertility_m_low 0 n + n n	15
+Param: rho_WD 0 n + n n	1
+Param: WD_alt_model 0 n + n n	0
+Param: wr_hintvl 0 n + n n	2
 
 SIM_NUM 1
 SEED 2
@@ -95,16 +153,6 @@ Function_Delete_Agent
    is removed).
    The user can provide content for the dying agent (caller pointer c) 
 'Delete_Agent' appears in the equation for: (never used)
-_INIT_
-
-END_DESCRIPTION
-
-Function_New_Agent
- This FUNCTION is called via fake_caller and initialises the new agent.
-   It is called from the population modul, whenever a new agent is created
-   (after it has been added).
-   The user can provide content for the new agent (caller pointer c) 
-'Init_New_Agent' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
@@ -181,13 +229,13 @@ _INIT_
 
 END_DESCRIPTION
 
-Parameter_age
+Variable_age
 (no description available)
 _INIT_
 
 END_DESCRIPTION
 
-Parameter_female
+Variable_female
 (no description available)
 _INIT_
 
@@ -215,6 +263,168 @@ Function_Death
 (no description available)
 _INIT_
 
+END_DESCRIPTION
+
+Variable_Init_Agent
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Function_Relevant_Other
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_psearch_radius
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_age_accept_low
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_age_accept_high
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_age_influence
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_Social_Pressure
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_Partner_Status
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Function_Potential_Partner
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_PartnerID
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_ro_a_high
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_ro_a_low
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Object_Settings
+Parameters relevant for the Wedding Ring model.
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_fertility_low
+minimum age for a mother to get a child
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_fertility_high
+Maximum age for a mother to get a child
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_wr_gamma
+(no description available)
+_INIT_
+All 1 instances equal to 2.
+END_DESCRIPTION
+
+Parameter_alpha_WR
+(no description available)
+_INIT_
+All 1 instances equal to 0.5.
+END_DESCRIPTION
+
+Parameter_beta_WR
+(no description available)
+_INIT_
+All 1 instances equal to 7.
+END_DESCRIPTION
+
+Parameter_c_WR
+(no description available)
+_INIT_
+All 1 instances equal to 25.
+END_DESCRIPTION
+
+Parameter_distance_wd
+(no description available)
+_INIT_
+All 1 instances equal to 1.
+END_DESCRIPTION
+
+Parameter_fertility_f_high
+(no description available)
+_INIT_
+All 1 instances equal to 45.
+END_DESCRIPTION
+
+Parameter_fertility_f_low
+(no description available)
+_INIT_
+All 1 instances equal to 15.
+END_DESCRIPTION
+
+Parameter_fertility_m_high
+(no description available)
+_INIT_
+All 1 instances equal to 65.
+END_DESCRIPTION
+
+Parameter_fertility_m_low
+(no description available)
+_INIT_
+All 1 instances equal to 15.
+END_DESCRIPTION
+
+Parameter_rho_WD
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_WD_alt_model
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_wr_hintvl
+(no description available)
+_INIT_
+All 1 instances equal to 2.
 END_DESCRIPTION
 
 

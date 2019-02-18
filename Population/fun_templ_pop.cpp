@@ -13,7 +13,7 @@
 // #define SWITCH_VERBOSE_OFF  //(un)comment to switch on(off)
 #define TRACK_SEQUENCE_MAX_T 1000 //number of steps for tracking
 #define SWITCH_PAJEK_OFF //(un)comment to switch on(off)
-// #define SWITCH_TRACK_SEQUENCE_OFF //(un)comment to switch on(off)
+#define SWITCH_TRACK_SEQUENCE_OFF //(un)comment to switch on(off)
 
 
 /******************************************************************************/
@@ -45,6 +45,47 @@ V("Init_Global"); //once then parameter
 /* Before all else, the population is updated */
 V("Pop_age");     //existing generation ages. Some persons may die.
 V("Pop_birth");   //If the population model generates new agents, that happens here.
+
+VERBOSE_MODE(true){
+    cur = POP_RANDOM_PERSON('x',10,30);
+    PLOG("\nRandomly selecting an agent within age 10 and 30.");
+    if (cur==NULL) {
+      PLOG("\n NO SUCH AGENT");
+    } else {
+    PLOG("\nInfos according to new method: ID %g, m_ID %g, f_ID %g, age %g, d_age %g, gender %g",
+      UIDS(cur),POP_MOTHERS(cur)!=NULL?UIDS(POP_MOTHERS(cur)):-1.0,POP_FATHERS(cur)!=NULL?UIDS(POP_FATHERS(cur)):-1.0,POP_AGES(cur),POP_D_AGES(cur),POP_FEMALES(cur)  );
+    }
+
+    cur=POP_RANDOM_PERSON('m',t,t+2); //male
+    PLOG("\nTest: Random agent should have gender %s and age between %i and %i","male",t,t+2);
+    if (cur==NULL){
+      PLOG("\nTest: No such agent exists");
+    } else {
+      PLOG("\nTest: Returned agent: ID %g  gender %s and age %g",UIDS(cur),POP_FEMALES(cur)==true?"female":"male",POP_AGES(cur));
+    }
+
+    cur=POP_RANDOM_PERSON('f',t,t+2); //female
+    PLOG("\nTest: Random agent should have gender %s and age between %i and %i","female",t,t+2);
+    if (cur==NULL){
+      PLOG("\nTest: No such agent exists");
+    } else {
+      PLOG("\nTest: Returned agent: ID %g  gender %s and age %g",UIDS(cur),POP_FEMALES(cur)==true?"female":"male",POP_AGES(cur));
+    }
+
+    cur=POP_RANDOM_PERSON('x',-1,-1); //doesn't matter
+    PLOG("\nTest: Random agent should have gender %s and age between %i and %i","unspecified",t,t+2);
+    if (cur==NULL){
+      PLOG("\nTest: No such agent exists");
+    } else {
+      PLOG("\nTest: Returned agent: ID %g  gender %s and age %g",UIDS(cur),POP_FEMALES(cur)==true?"female":"male",POP_AGES(cur));
+    }
+}
+
+VERBOSE_MODE(true){
+    POP_FAMILY_DEGREE(POP_RANDOM_PERSON('f',-1,-1),POP_RANDOM_PERSON('m',-1,-1));
+    POP_CHECK_INCEST(POP_RANDOM_PERSON('f',-1,-1),POP_RANDOM_PERSON('m',-1,-1),3);
+}
+  //END: Test new population module
 
 RESULT(0.0)
 

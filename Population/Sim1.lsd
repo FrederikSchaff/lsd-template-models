@@ -80,7 +80,7 @@ Var: Pop_age 0 s + n p
 Var: Pop_birth 0 s + n n
 Param: m1_alpha 0 n + n n	5.44
 Param: m1_beta 0 n + n n	-0.014729
-Param: Pop_const_n 0 s + n n	200
+Param: Pop_const_n 0 s + n n	2000
 Param: Model_Type 0 n + n n	1
 Param: m0_maxLife 0 n + n n	100
 

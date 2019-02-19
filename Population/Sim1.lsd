@@ -17,12 +17,11 @@ Label Root
 	Son: Agent
 	Label Agent
 	{
-		Param: ID
 		Var: age
 		Var: female
 		Param: death_age
-		Param: father
-		Param: mother
+		Var: father
+		Var: mother
 		Func: Death
 		Var: Init_Agent
 		Func: Relevant_Other
@@ -31,11 +30,15 @@ Label Root
 		Var: age_accept_high
 		Var: age_influence
 		Var: Social_Pressure
-		Var: Partner_Status
+		Func: Partner_Status
 		Func: Potential_Partner
 		Param: PartnerID
 		Param: ro_a_high
 		Param: ro_a_low
+		Var: Find_Partner
+		Var: ID
+		Var: nChildren
+		Param: tnext_pot_birth
 
 	}
 
@@ -80,17 +83,16 @@ Var: Pop_age 0 s + n p
 Var: Pop_birth 0 s + n n
 Param: m1_alpha 0 n + n n	5.44
 Param: m1_beta 0 n + n n	-0.014729
-Param: Pop_const_n 0 s + n n	2000
+Param: Pop_const_n 0 s + n n	200
 Param: Model_Type 0 n + n n	1
 Param: m0_maxLife 0 n + n n	100
 
 Object: Agent C	1
-Param: ID 0 n + n n	0
 Var: age 0 s + n n
 Var: female 0 s + n n
 Param: death_age 0 s + n n	0
-Param: father 0 n + n n	-1
-Param: mother 0 n + n n	-1
+Var: father 0 n + n n
+Var: mother 0 n + n n
 Func: Death 0 n + n n
 Var: Init_Agent 0 n + n n
 Func: Relevant_Other 0 n + n n
@@ -99,11 +101,15 @@ Var: age_accept_low 0 n + n n
 Var: age_accept_high 0 n + n n
 Var: age_influence 0 n + n n
 Var: Social_Pressure 0 n + n n
-Var: Partner_Status 0 n + n n
+Func: Partner_Status 0 n + n n
 Func: Potential_Partner 0 n + n n
 Param: PartnerID 0 n + n n	0
 Param: ro_a_high 0 n + n n	0
 Param: ro_a_low 0 n + n n	0
+Var: Find_Partner 0 n + n n
+Var: ID 0 n + n n
+Var: nChildren 0 s + n n
+Param: tnext_pot_birth 0 n + n n	0
 
 Object: Settings C	1
 Param: fertility_low 0 n + n n	15
@@ -148,7 +154,6 @@ _INIT_
 END_DESCRIPTION
 
 Function_Delete_Agent
-
 'Delete_Agent' appears in the equation for: (never used)
 _INIT_
 
@@ -224,12 +229,6 @@ _INIT_
 
 END_DESCRIPTION
 
-Parameter_ID
-(no description available)
-_INIT_
-
-END_DESCRIPTION
-
 Variable_age
 TRACK_SEQUENCE
 
@@ -252,13 +251,13 @@ _INIT_
 
 END_DESCRIPTION
 
-Parameter_father
+Variable_father
 Holds the ID of the father
 _INIT_
 
 END_DESCRIPTION
 
-Parameter_mother
+Variable_mother
 Holds the ID of the mother
 _INIT_
 
@@ -331,7 +330,7 @@ _INIT_
 
 END_DESCRIPTION
 
-Variable_Partner_Status
+Function_Partner_Status
  Is there currently a partner? 0: No, 1: Yes. Also check if partner is dead. 
 'Partner_Status' appears in the equation for: Social_Pressure
 _INIT_
@@ -358,6 +357,30 @@ All 1 instances equal to 0.
 END_DESCRIPTION
 
 Parameter_ro_a_low
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Variable_Find_Partner
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_ID
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_nChildren
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_tnext_pot_birth
 (no description available)
 _INIT_
 All 1 instances equal to 0.

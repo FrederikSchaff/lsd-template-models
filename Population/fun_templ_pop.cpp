@@ -36,7 +36,7 @@ MODELBEGIN
 /*----------------------------------------------------------------------------*/
 
 ////////////////////////
-EQUATION("Updating_Scheme")
+TEQUATION("Updating_Scheme")
 /*  Controls the flow of events at any single simulation tick. This should always
     be the first equation called in any model! */
 //TRACK_SEQUENCE
@@ -46,7 +46,7 @@ V("Init_Global"); //once then parameter
 V("Pop_age");     //existing generation ages. Some persons may die.
 V("Pop_birth");   //If the population model generates new agents, that happens here.
 
-VERBOSE_MODE(true)
+VERBOSE_MODE(false)
 {
     cur = POP_RANDOM_PERSON('x', 10, 30);
     PLOG("\nRandomly selecting an agent within age 10 and 30.");
@@ -86,7 +86,7 @@ VERBOSE_MODE(true)
     }
 }
 
-VERBOSE_MODE(true)
+VERBOSE_MODE(false)
 {
     POP_FAMILY_DEGREE(POP_RANDOM_PERSON('f', -1, -1), POP_RANDOM_PERSON('m', -1, -1));
     POP_CHECK_INCEST(POP_RANDOM_PERSON('f', -1, -1), POP_RANDOM_PERSON('m', -1, -1), 3);
@@ -96,7 +96,7 @@ VERBOSE_MODE(true)
 RESULT(0.0)
 
 ////////////////////////
-EQUATION("Init_Global")
+TEQUATION("Init_Global")
 /*  This it the main initialisation function, calling all initialisation action
     necessary. */
 
@@ -124,27 +124,50 @@ PARAMETER
 RESULT(0)
 
 /******************************************************************************/
-/*           Population modul linking - see description.txt                   */
+/*           Template Model Start - see description.txt                   */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-EQUATION("age")
+TEQUATION("age")
 //TRACK_SEQUENCE
 RESULT(POP_AGE)
 
-EQUATION("female")
+TEQUATION("female")
 //TRACK_SEQUENCE
 PARAMETER
 RESULT(POP_FEMALE)
 
-EQUATION("Death")
+EQUATION("ID")
+PARAMETER
+RESULT(UID)
+
+EQUATION("mother")
+int id = -1;
+cur = POP_MOTHER;
+if (cur != NULL)
+    id = UIDS(cur);
+PARAMETER
+RESULT(id)
+
+EQUATION("father")
+int id = -1;
+cur = POP_FATHER;
+if (cur != NULL)
+    id = UIDS(cur);
+PARAMETER
+RESULT(id)
+
+EQUATION("nChildren")
+RESULT(POP_NCHILDREN)
+
+TEQUATION("Death")
 /* Kill the agent */
 //TRACK_SEQUENCE
 DELETE(p)
-//   POP_INFO
+//   PLOG(POP_INFO)
 RESULT(0.0)
 
 
-EQUATION("Pop_birth")
+TEQUATION("Pop_birth")
 /* Add next generation.*/
 //TRACK_SEQUENCE
 int model_type = V("Model_Type"); //e.g., 1 == BLL
@@ -157,26 +180,32 @@ else
 {
     n_generation = V("Pop_const_n") / V("m0_maxLife") * 2;
 }
-
+const double timeToNewBirth = 3.0;
 //add new agents
 for (int i = 0; i < n_generation; i++)
 {
     object* ptrAgent = ADDOBJLS(p->up, "Agent", 0); //create LSD agent
-    object* mother = POP_RANDOM_PERSON('f', V("fertility_low"), V("fertility_high")); //find a mother
+    object* mother = POP_RANDOM_PERSON_CND('f', V("fertility_low"), V("fertility_high"), "tnext_pot_birth", '<', T+1 ); //find a mother that can again get a child.
     object* father = NULL; //place holder - no father (yet)
 
-    if (mother != NULL) { //check if there is a child already,
+    if (mother != NULL) { //check if there is a suitable fater
         // PLOG("\n Check POP_MGENITORS");
-        father = POP_MGENITORS(mother);
+        // father = POP_MGENITORS(mother); //same father as for former children
         // if (father==NULL)
         // PLOG("\n no father");
+        WRITES(mother,"tnext_pot_birth",T+timeToNewBirth);
+        VS(mother,"Find_Partner");//Make sure mother looked for partner
+        if (VS(mother,"Partner_Status")==1.0){
+            father = SEARCH_UID( VS(mother,"PartnerID") );
+        }
+        
     }
 
-    if (father == NULL) { //no father yet
-        father = POP_RANDOM_PERSON('m', 15, 65);
-    }
+    // if (father == NULL) { //no father yet
+        // father = POP_RANDOM_PERSON('m', 15, 65);
+    // }
 
-    POP_ADD_PERSON_WPARENTS(ptrAgent, mother, father); //Add to population module
+    POP_ADD_PERSON_WPARENTS(ptrAgent, father, mother); //Add to population module
 
     //Add to space for wedding ring model
     if (NULL != father && NULL != mother) {
@@ -185,9 +214,9 @@ for (int i = 0; i < n_generation; i++)
     else if (NULL != mother) {
         ADD_TO_SPACE_SHARES(ptrAgent, mother);
     }
-    else if (NULL != father) {
-        ADD_TO_SPACE_SHARES(ptrAgent, father);
-    }
+    // else if (NULL != father) {
+        // ADD_TO_SPACE_SHARES(ptrAgent, father);
+    // }
     else {
         ADD_TO_SPACE_RNDS(ptrAgent, root); //Add to space at random position
     }
@@ -203,7 +232,7 @@ RESULT(double(n_generation) )
 
 
 ///////////////////////////////
-EQUATION("Pop_age")
+TEQUATION("Pop_age")
 /* Each agents get older one year. */
 //TRACK_SEQUENCE
 
@@ -230,7 +259,7 @@ RESULT(alive)
 
 /***** Now the wedding ring model ****/
 
-EQUATION("Init_Agent")
+TEQUATION("Init_Agent")
 /*  Initialise a new agent
     - define agent characteristics
 */
@@ -264,7 +293,7 @@ PARAMETER
 RESULT(0.0)
 
 
-EQUATION("psearch_radius")
+TEQUATION("psearch_radius")
 /*  This is the search radius for the partner search in the Wedding Ring model.
     It is set in 0,1 (relative)
 */
@@ -277,7 +306,7 @@ double psearch_radius = sp * ai_P * distance_wd;
 
 RESULT(distance_wd)
 
-EQUATION("age_accept_low")
+TEQUATION("age_accept_low")
 /* Calculate the lower bound of acceptable age */
 bool alt_model = V("WD_alt_model") == 0.0 ? false : true; //define social pressure on share of people married, as in the original, or on share of people with children (true).
 double age_accept_low = POP_AGE - V("Social_Pressure") * V("age_influence") * V("c_WR");
@@ -287,7 +316,7 @@ if (alt_model)
 }
 RESULT(age_accept_low)
 
-EQUATION("age_accept_high")
+TEQUATION("age_accept_high")
 /* Calculate the lower bound of acceptable age */
 bool alt_model = V("WD_alt_model") == 0.0 ? false : true; //define social pressure on share of people married, as in the original, or on share of people with children (true).
 double age_accept_high = POP_AGE + V("Social_Pressure") * V("age_influence") * V("c_WR");
@@ -297,7 +326,7 @@ if (alt_model)
 }
 RESULT(age_accept_high)
 
-EQUATION("age_influence")
+TEQUATION("age_influence")
 /*  A factor that decides on the size of the socio-spatial network based on the age of the person. */
 //TRACK_SEQUENCE
 double age_influence;
@@ -334,11 +363,11 @@ else
 
 RESULT(age_influence)
 
-EQUATION("Social_Pressure")
+TEQUATION("Social_Pressure")
 /*  This is the social presure that rests upon the individual to get a partner and start getting (more) children
     At this point, the parameters alpha and beta are hard coded as in the papers [2,3], because the parameters it self are not useful to interprete.
 */
-
+SET_LOCAL_CLOCK_RF
 bool alt_model = V("WD_alt_model") == 0.0 ? false : true; //define social pressure on share of people married, as in the original, or on share of people with children (true).
 double pocm = 0.0;
 double total = 0.0;
@@ -369,18 +398,18 @@ FCYCLE_NEIGHBOUR(cur, "Agent", V("distance_wd"))   //first check distance
 
 }
 
-double beta = 7.0; //V("beta_WR");
-double alpha = 0.5;// V("alpha_WR");
+const double beta = 7.0; //V("beta_WR");
+const double alpha = 0.5;// V("alpha_WR");
 double temp = exp(beta * (pocm - alpha));
 double sp = temp / (1 + temp);
-
+REPORT_LOCAL_CLOCK_CND(0.02);
 RESULT(sp)
 
-EQUATION("Partner_Status")
-/* Is there currently a partner? 0: No, 1: Yes. Also check if partner is dead. */
+TEQUATION("Partner_Status")
+/* Function. Is there currently a partner? 0: No, 1: Yes. Also check if partner is dead. */
 double has_partner = 0.0; //no partner yet
 double partner_id = V("PartnerID");
-if (partner_id >= 0)
+if (partner_id > 0)
 {
     object* Partner = SEARCH_UID(partner_id);
     if (Partner == NULL) {
@@ -392,12 +421,19 @@ if (partner_id >= 0)
 }
 RESULT(has_partner)
 
-EQUATION("Potential_Partner")
-/* This is a function that reports to the caller if the callee is a suitable match, 
-which implies also that the callee finds the caller suitable. */
+TEQUATION("Potential_Partner")
+/*  This is a function that reports to the caller if the callee is a suitable match,
+    which implies also that the callee finds the caller suitable. */
 double is_match = 0.0; //no
+bool alt_model = V("WD_alt_model") == 0.0 ? false : true; //define social pressure on share of people married, as in the original, or on share of people with children (true).
 double distance = DISTANCE(c);
-if ( POP_FEMALE != POP_FEMALES(c) //different sex
+bool is_free = alt_model ? ( V("Partner_Status") != 1 ) : ( V("Partner_Status") == 0 ); //in original model: only if unmarried. in alt model: if currently no partner.
+const int prohibited_degree = 5; //maximum degree of relatedness that is prohibited (i.e. most distant relatedness not allowed. 5 == cousinship)
+bool not_of_kin = alt_model ? ( false == POP_CHECK_INCEST(c, p, prohibited_degree) ) : true;
+
+if (    true == is_free //can couple
+        && POP_FEMALE != POP_FEMALES(c) //different sex
+        && true == not_of_kin //are not of same kin
         && distance < V("psearch_radius")  //within social/spatial range
         && distance < VS(c, "psearch_radius")
         && V("age_accept_low") <= POP_AGES(c) //within age range
@@ -409,22 +445,42 @@ if ( POP_FEMALE != POP_FEMALES(c) //different sex
 }
 RESULT(is_match)
 
-EQUATION("Find_Partner")
-/* If the agent does not yet have a partner, it actively searches for a partner. 
-In the original wedding ring model it searches for a partner if it didn't have one yet,
-i.e., if the partner died it will still not look for a new one.
-In the alternative model it searches for a partner if it is in fertility range only
-and if it doesn't have a partner.
+TEQUATION("Find_Partner")
+/*  If the agent does not yet have a partner, it actively searches for a partner.
+    In the original wedding ring model it searches for a partner if it didn't have one yet,
+    i.e., if the partner died it will still not look for a new one.
+    In the alternative model it searches for a partner if it is in fertility range only
+    and if it doesn't have a partner.
 
-Note: Currently we do not break-up a partnership if one of the partners leaves fertility range.
+    Note: Currently we do not break-up a partnership if one of the partners leaves fertility range.
 */
+SET_LOCAL_CLOCK_RF
+bool alt_model = V("WD_alt_model") == 0.0 ? false : true; //define social pressure on share of people married, as in the original, or on share of people with children (true).
+bool is_free = alt_model ? ( V("Partner_Status") != 1 ) : ( V("Partner_Status") == 0 ); //in original model: only if unmarried. in alt model: if currently no partner.
 
+if (true == is_free)
+{
+    //randomly cycle through neighbours in partner range, mating with the first one that fits.
+    RCYCLE_NEIGHBOUR(cur, "Agent", V("psearch_radius")) { //first check distance
+        if (VS(cur, "Potential_Partner") == 1.0) {
+            WRITE("PartnerID",UIDS(cur));            
+            WRITES(cur,"PartnerID",UID);    
+            PLOG("\n Matching agents %s -- %s ",POP_INFO, POP_INFOS(cur) ); 
+            is_free = false;            
+            break; //found a partner, end search
+        }
+    }
+}
+// if (is_free)
+    // PLOG("\n At time %d no partner for %s",t,POP_INFO);
+REPORT_LOCAL_CLOCK_CND(0.02);
+RESULT(V("Partner_Status"))
 
 /******************************************************************************/
-/*  Population modul linking end                                              */
+/*  Template Model End                                                        */
 /*----------------------------------------------------------------------------*/
 
-/* Theory specific below */
+/* User specific below */
 
 
 

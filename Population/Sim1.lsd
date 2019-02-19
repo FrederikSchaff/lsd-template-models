@@ -134,8 +134,8 @@ Object_Root
 END_DESCRIPTION
 
 Variable_Updating_Scheme
- Controls the flow of events at any single simulation tick. This should always
-   be the first equation called in any model! 
+  Controls the flow of events at any single simulation tick. This should always
+    be the first equation called in any model! 
 'Updating_Scheme' appears in the equation for: (never used)
 _INIT_
 
@@ -148,17 +148,16 @@ _INIT_
 END_DESCRIPTION
 
 Function_Delete_Agent
- This FUNCTION is called via fake_caller when an agent dies.
-   It is called from the population modul, whenever an agent dies (before it
-   is removed).
-   The user can provide content for the dying agent (caller pointer c) 
+
 'Delete_Agent' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_Init_Global
-(no description available)
+  This it the main initialisation function, calling all initialisation action
+    necessary. 
+'Init_Global' appears in the equation for: Updating_Scheme
 _INIT_
 
 END_DESCRIPTION
@@ -170,13 +169,15 @@ _INIT_
 END_DESCRIPTION
 
 Variable_Pop_age
+ Each agents get older one year. 
 'Pop_age' appears in the equation for: Updating_Scheme
 _INIT_
 
 END_DESCRIPTION
 
 Variable_Pop_birth
-'Pop_birth' appears in the equation for: Updating_Scheme
+ Add next generation.
+'Pop_birth' appears in the equation for: Updating_Scheme, Init_Global
 _INIT_
 
 END_DESCRIPTION
@@ -230,13 +231,17 @@ _INIT_
 END_DESCRIPTION
 
 Variable_age
-(no description available)
+TRACK_SEQUENCE
+
+'age' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_female
-(no description available)
+TRACK_SEQUENCE
+
+'female' appears in the equation for: Updating_Scheme
 _INIT_
 
 END_DESCRIPTION
@@ -260,61 +265,82 @@ _INIT_
 END_DESCRIPTION
 
 Function_Death
-(no description available)
+ Kill the agent 
+'Death' appears in the equation for: Pop_age
 _INIT_
 
 END_DESCRIPTION
 
 Variable_Init_Agent
-(no description available)
+  Initialise a new agent
+    - define agent characteristics
+
+'Init_Agent' appears in the equation for: Pop_birth
 _INIT_
 
 END_DESCRIPTION
 
 Function_Relevant_Other
-(no description available)
+  This is a FUNCTION that reports to the caller if the callee (the agent which holds the function) is a relevant other.
+
+    A person is relevant to the other person, if it is (a) within physical distance, emulating the social distance and (b) within age distance.
+    We may disable the check for (a) if we search within the relevant distance ex ante.
+
+
+'Relevant_Other' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_psearch_radius
-(no description available)
+  This is the search radius for the partner search in the Wedding Ring model.
+    It is set in 0,1 (relative)
+
+'psearch_radius' appears in the equation for: Potential_Partner
 _INIT_
 
 END_DESCRIPTION
 
 Variable_age_accept_low
-(no description available)
+ Calculate the lower bound of acceptable age 
+'age_accept_low' appears in the equation for: Potential_Partner
 _INIT_
 
 END_DESCRIPTION
 
 Variable_age_accept_high
-(no description available)
+ Calculate the lower bound of acceptable age 
+'age_accept_high' appears in the equation for: Potential_Partner
 _INIT_
 
 END_DESCRIPTION
 
 Variable_age_influence
-(no description available)
+  A factor that decides on the size of the socio-spatial network based on the age of the person. 
+'age_influence' appears in the equation for: psearch_radius, age_accept_low, age_accept_high
 _INIT_
 
 END_DESCRIPTION
 
 Variable_Social_Pressure
-(no description available)
+  This is the social presure that rests upon the individual to get a partner and start getting (more) children
+    At this point, the parameters alpha and beta are hard coded as in the papers [2,3], because the parameters it self are not useful to interpret.
+
+'Social_Pressure' appears in the equation for: psearch_radius, age_accept_low, age_accept_high
 _INIT_
 
 END_DESCRIPTION
 
 Variable_Partner_Status
-(no description available)
+ Is there currently a partner? 0: No, 1: Yes. Also check if partner is dead. 
+'Partner_Status' appears in the equation for: Social_Pressure
 _INIT_
 
 END_DESCRIPTION
 
 Function_Potential_Partner
-(no description available)
+ This is a function that reports to the caller if the callee is a suitable match, which implies also that the callee finds the caller suitable. 
+'Potential_Partner' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION

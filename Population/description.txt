@@ -44,7 +44,7 @@ default model: Randomly select f.
 If matched, select prior m partner. Else select random m and match.
 
 For information on how the back-end works, please take a look at the (yet
-scarce, I admit) documentation of the population module.
+scarce, I admit) documentation of the population module and the accompanying paper.
 
 (PRESS CTRL+E TO EDIT USER EQUATIONS)
 

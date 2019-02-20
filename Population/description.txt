@@ -32,16 +32,6 @@ In addition, the Wedding Ring model is implemented explicitly to define partner 
   Ring. Exploring a Semi-Artificial Model of Population for the United Kingdom with Gaussian
   process emulators. In Demographic Research 29, pp. 729–766.
   DOI: 10.4054/DemRes.2013.29.27.
-  
-  
-  Model def: 
-f_min_w
-f_max_w
-f_min_f
-f_max_f
-
-default model: Randomly select f.
-If matched, select prior m partner. Else select random m and match.
 
 For information on how the back-end works, please take a look at the (yet
 scarce, I admit) documentation of the population module and the accompanying paper.

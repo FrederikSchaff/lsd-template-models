@@ -11,6 +11,8 @@ Label Root
 		Param: Pop_const_n
 		Param: Model_Type
 		Param: m0_maxLife
+		Func: Add_Agent
+		Param: StorckChildRate
 
 	}
 
@@ -39,6 +41,7 @@ Label Root
 		Var: ID
 		Var: nChildren
 		Param: tnext_pot_birth
+		Var: PotentialMother
 
 	}
 
@@ -86,6 +89,8 @@ Param: m1_beta 0 n + n n	-0.014729
 Param: Pop_const_n 0 s + n n	200
 Param: Model_Type 0 n + n n	1
 Param: m0_maxLife 0 n + n n	100
+Func: Add_Agent 0 n + n n
+Param: StorckChildRate 0 s + n n	0
 
 Object: Agent C	1
 Var: age 0 s + n n
@@ -110,6 +115,7 @@ Var: Find_Partner 0 n + n n
 Var: ID 0 n + n n
 Var: nChildren 0 s + n n
 Param: tnext_pot_birth 0 n + n n	0
+Var: PotentialMother 0 n + n n
 
 Object: Settings C	1
 Param: fertility_low 0 n + n n	15
@@ -221,6 +227,18 @@ Parameter_m0_maxLife
 (no description available)
 _INIT_
 
+END_DESCRIPTION
+
+Function_Add_Agent
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_StorckChildRate
+(no description available)
+_INIT_
+All 1 instances equal to 0.
 END_DESCRIPTION
 
 Object_Agent
@@ -384,6 +402,10 @@ Parameter_tnext_pot_birth
 (no description available)
 _INIT_
 All 1 instances equal to 0.
+END_DESCRIPTION
+
+Variable_PotentialMother
+(no description available)
 END_DESCRIPTION
 
 Object_Settings

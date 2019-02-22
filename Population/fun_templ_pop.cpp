@@ -115,6 +115,7 @@ double init_global_ret = 0.0;
     }
 
     INIT_SPACE_ROOT_WRAP(100, 100, 15); //initialise grid space as in BHSC The Grid Size needs to be squared, but is otherwise just a performance parameter.
+    INIT_LAT_GISS(root, 0);
 
     object* to_delete = SEARCH("Agent"); //Template person will die.
     V("Pop_birth"); // a new agent is added NOW.
@@ -278,6 +279,8 @@ double add_agent_ret = CURRENT + 1;
     else {
         ADD_TO_SPACE_RNDS(ptrAgent, root); //Add to space at random position
     }
+    SET_LAT_PRIORITYS(ptrAgent,0);
+    SET_LAT_COLORS(ptrAgent,1000);
 
     if (V("Model_Type") == 0) {
         POP_SET_DAGES(ptrAgent, RND * V("m0_maxLife")); //in the no model case, chose random age between 0 and 100.

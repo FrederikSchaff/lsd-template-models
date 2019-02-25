@@ -42,14 +42,14 @@ Label Root
 		Var: nChildren
 		Param: tnext_pot_birth
 		Var: PotentialMother
+		Var: IsFertile
+		Var: AvgKinshipDegree
 
 	}
 
 	Son: Settings
 	Label Settings
 	{
-		Param: fertility_low
-		Param: fertility_high
 		Param: wr_gamma
 		Param: alpha_WR
 		Param: beta_WR
@@ -62,6 +62,7 @@ Label Root
 		Param: rho_WD
 		Param: WD_alt_model
 		Param: wr_hintvl
+		Param: timeToNewBirth
 
 	}
 
@@ -69,6 +70,11 @@ Label Root
 	Param: SA_
 	Func: Delete_Agent
 	Var: Init_Global
+	Var: Statistics
+	Param: SP_avg
+	Param: SP_max
+	Param: SP_min
+	Param: SP_sd
 
 }
 
@@ -80,15 +86,20 @@ Var: Updating_Scheme 0 n + n n
 Param: SA_ 0 n + n n	0
 Func: Delete_Agent 0 n + n n
 Var: Init_Global 0 n + n n
+Var: Statistics 0 n + n n
+Param: SP_avg 0 s + n n	0
+Param: SP_max 0 s + n n	0
+Param: SP_min 0 s + n n	0
+Param: SP_sd 0 s + n n	0
 
 Object: Pop_Model C	1
 Var: Pop_age 0 s + n p
 Var: Pop_birth 0 s + n n
 Param: m1_alpha 0 n + n n	5.44
 Param: m1_beta 0 n + n n	-0.014729
-Param: Pop_const_n 0 s + n n	200
+Param: Pop_const_n 0 s + n n	100
 Param: Model_Type 0 n + n n	1
-Param: m0_maxLife 0 n + n n	100
+Param: m0_maxLife 0 n + n n	50
 Func: Add_Agent 0 n + n n
 Param: StorckChildRate 0 s + n n	0
 
@@ -116,10 +127,10 @@ Var: ID 0 n + n n
 Var: nChildren 0 s + n n
 Param: tnext_pot_birth 0 n + n n	0
 Var: PotentialMother 0 n + n n
+Var: IsFertile 0 n + n n
+Var: AvgKinshipDegree 0 s + n n
 
 Object: Settings C	1
-Param: fertility_low 0 n + n n	15
-Param: fertility_high 0 n + n n	35
 Param: wr_gamma 0 n + n n	2
 Param: alpha_WR 0 n + n n	0.5
 Param: beta_WR 0 n + n n	7
@@ -132,6 +143,7 @@ Param: fertility_m_low 0 n + n n	15
 Param: rho_WD 0 n + n n	1
 Param: WD_alt_model 0 n + n n	0
 Param: wr_hintvl 0 n + n n	2
+Param: timeToNewBirth 0 n + n n	3
 
 SIM_NUM 1
 SEED 2
@@ -146,8 +158,6 @@ Object_Root
 END_DESCRIPTION
 
 Variable_Updating_Scheme
-  Controls the flow of events at any single simulation tick. This should always
-    be the first equation called in any model! 
 'Updating_Scheme' appears in the equation for: (never used)
 _INIT_
 
@@ -166,11 +176,39 @@ _INIT_
 END_DESCRIPTION
 
 Variable_Init_Global
-  This it the main initialisation function, calling all initialisation action
-    necessary. 
-'Init_Global' appears in the equation for: Updating_Scheme
+'Init_Global' appears in the equation for: (never used)
 _INIT_
 
+END_DESCRIPTION
+
+Variable_Statistics
+'Statistics' appears in the equation for: (never used)
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_SP_avg
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_SP_max
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_SP_min
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_SP_sd
+(no description available)
+_INIT_
+All 1 instances equal to 0.
 END_DESCRIPTION
 
 Object_Pop_Model
@@ -180,15 +218,13 @@ _INIT_
 END_DESCRIPTION
 
 Variable_Pop_age
- Each agents get older one year. 
-'Pop_age' appears in the equation for: Updating_Scheme
+'Pop_age' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_Pop_birth
- Add next generation.
-'Pop_birth' appears in the equation for: Updating_Scheme, Init_Global
+'Pop_birth' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
@@ -230,7 +266,7 @@ _INIT_
 END_DESCRIPTION
 
 Function_Add_Agent
-(no description available)
+'Add_Agent' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
@@ -248,17 +284,13 @@ _INIT_
 END_DESCRIPTION
 
 Variable_age
-TRACK_SEQUENCE
-
 'age' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_female
-TRACK_SEQUENCE
-
-'female' appears in the equation for: Updating_Scheme
+'female' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
@@ -270,93 +302,74 @@ _INIT_
 END_DESCRIPTION
 
 Variable_father
-Holds the ID of the father
+ Provides the ID of the father, if exists. -1.0 else. 
+'father' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_mother
-Holds the ID of the mother
+ Provides the ID of the mother, if exists. -1.0 else. 
+'mother' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Function_Death
- Kill the agent 
-'Death' appears in the equation for: Pop_age
+'Death' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_Init_Agent
-  Initialise a new agent
-    - define agent characteristics
-
-'Init_Agent' appears in the equation for: Pop_birth
+'Init_Agent' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Function_Relevant_Other
-  This is a FUNCTION that reports to the caller if the callee (the agent which holds the function) is a relevant other.
-
-    A person is relevant to the other person, if it is (a) within physical distance, emulating the social distance and (b) within age distance.
-    We may disable the check for (a) if we search within the relevant distance ex ante.
-
-
 'Relevant_Other' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_psearch_radius
-  This is the search radius for the partner search in the Wedding Ring model.
-    It is set in 0,1 (relative)
-
-'psearch_radius' appears in the equation for: Potential_Partner
+'psearch_radius' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_age_accept_low
- Calculate the lower bound of acceptable age 
-'age_accept_low' appears in the equation for: Potential_Partner
+'age_accept_low' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_age_accept_high
- Calculate the lower bound of acceptable age 
-'age_accept_high' appears in the equation for: Potential_Partner
+'age_accept_high' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_age_influence
-  A factor that decides on the size of the socio-spatial network based on the age of the person. 
-'age_influence' appears in the equation for: psearch_radius, age_accept_low, age_accept_high
+'age_influence' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_Social_Pressure
-  This is the social presure that rests upon the individual to get a partner and start getting (more) children
-    At this point, the parameters alpha and beta are hard coded as in the papers [2,3], because the parameters it self are not useful to interpret.
-
-'Social_Pressure' appears in the equation for: psearch_radius, age_accept_low, age_accept_high
+'Social_Pressure' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Function_Partner_Status
- Is there currently a partner? 0: No, 1: Yes. Also check if partner is dead. 
-'Partner_Status' appears in the equation for: Social_Pressure
+'Partner_Status' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Function_Potential_Partner
- This is a function that reports to the caller if the callee is a suitable match, which implies also that the callee finds the caller suitable. 
 'Potential_Partner' appears in the equation for: (never used)
 _INIT_
 
@@ -381,19 +394,20 @@ All 1 instances equal to 0.
 END_DESCRIPTION
 
 Variable_Find_Partner
-(no description available)
+'Find_Partner' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_ID
-(no description available)
+'ID' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
 
 Variable_nChildren
-(no description available)
+ Count number of children 
+'nChildren' appears in the equation for: (never used)
 _INIT_
 
 END_DESCRIPTION
@@ -405,23 +419,25 @@ All 1 instances equal to 0.
 END_DESCRIPTION
 
 Variable_PotentialMother
-(no description available)
+'PotentialMother' appears in the equation for: (never used)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_IsFertile
+'IsFertile' appears in the equation for: (never used)
+_INIT_
+
+END_DESCRIPTION
+
+Variable_AvgKinshipDegree
+'AvgKinshipDegree' appears in the equation for: (never used)
+_INIT_
+
 END_DESCRIPTION
 
 Object_Settings
 Parameters relevant for the Wedding Ring model.
-_INIT_
-
-END_DESCRIPTION
-
-Parameter_fertility_low
-minimum age for a mother to get a child
-_INIT_
-
-END_DESCRIPTION
-
-Parameter_fertility_high
-Maximum age for a mother to get a child
 _INIT_
 
 END_DESCRIPTION
@@ -496,6 +512,12 @@ Parameter_wr_hintvl
 (no description available)
 _INIT_
 All 1 instances equal to 2.
+END_DESCRIPTION
+
+Parameter_timeToNewBirth
+(no description available)
+_INIT_
+All 1 instances equal to 3.
 END_DESCRIPTION
 
 

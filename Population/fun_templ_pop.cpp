@@ -563,6 +563,7 @@ double potential_partner_ret = 0.0;
     bool is_free = alt_model ? ( V("Partner_Status") != 1 ) : ( V("Partner_Status") == 0 ); //in original model: only if unmarried. in alt model: if currently no partner.
     const int prohibited_degree = 5; //maximum degree of relatedness that is prohibited (i.e. most distant relatedness not allowed. 5 == cousinship)
     // bool not_of_kin = alt_model ? ( false == POP_CHECK_INCEST(c, p, prohibited_degree) ) : true;
+    PLOG(LSD_VALIDATE::track_sequence(t,p,c,var).c_str());
     PLOG("\n Caller %p %g (%s) and callee %p %g (%s)",c, UIDS(c), POP_FEMALES(c) ? "female" : "male" ,p,UID, POP_FEMALE ? "female" : "male" );
     if (POP_FEMALE != POP_FEMALES(c)){
     PLOG("\nTest Pot partner %g and %g.", UID, UIDS(c));

@@ -613,8 +613,9 @@ double find_partner_ret = 0.0;
     if (true == is_free) {
         //randomly cycle through neighbours in partner range, mating with the first one that fits.
         int count = 0;
-        RCYCLE_NEIGHBOUR(cur, "Agent", ABSOLUTE_DISTANCE ( V("psearch_radius") ) ) { //first check distance
+        RCYCLE_NEIGHBOUR(cur, p->label, ABSOLUTE_DISTANCE ( V("psearch_radius") ) ) { //first check distance
         if (cur == p){
+            PLOG("\nSkip self. Absolute distance is %g",ABSOLUTE_DISTANCE ( V("psearch_radius")));
             continue; //skip self
         }
         

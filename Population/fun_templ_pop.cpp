@@ -405,7 +405,7 @@ TEQUATION("psearch_radius")
     It is set in 0,1 (relative)
 */
 //TRACK_SEQUENCE
-END_EQUATION(1.0);
+// END_EQUATION(1.0);
 double psearch_radius_ret = 0.0;
 {
     double sp = V("Social_Pressure");
@@ -443,7 +443,7 @@ RESULT(age_accept_high_ret)
 TEQUATION("age_influence")
 /*  A factor that decides on the size of the socio-spatial network based on the age of the person. */
 //TRACK_SEQUENCE
-END_EQUATION(1.0);
+// END_EQUATION(1.0);
 double age_influence_ret = 0.0;
 {
     double age = POP_AGE;
@@ -478,7 +478,7 @@ TEQUATION("Social_Pressure")
 */
 SET_LOCAL_CLOCK_RF
 ADD_LOCAL_CLOCK_TRACKSEQUENCE
-END_EQUATION(1.0);
+// END_EQUATION(1.0);
 double social_pressure_ret = 0.0;
 {
     bool alt_model = V("WD_alt_model") == 0.0 ? false : true; //define social pressure on share of people married, as in the original, or on share of people with children (true).
@@ -555,33 +555,38 @@ RESULT(partner_status_ret)
 TEQUATION("Potential_Partner")
 /*  This is a function that reports to the caller if the callee is a suitable match,
     which implies also that the callee finds the caller suitable. */
+    
+if (c == p){
+    PLOG("\nError! Caller equals callee");
+    ABORT;
+}    
 double potential_partner_ret = 0.0;
 {
     double is_match = 0.0; //no
     bool alt_model = V("WD_alt_model") == 0.0 ? false : true; //define social pressure on share of people married, as in the original, or on share of people with children (true).
-    double distance = DISTANCE(c);
+    double distance = RELATIVE_DISTANCE( DISTANCE(c) );
     bool is_free = alt_model ? ( V("Partner_Status") != 1 ) : ( V("Partner_Status") == 0 ); //in original model: only if unmarried. in alt model: if currently no partner.
     const int prohibited_degree = 5; //maximum degree of relatedness that is prohibited (i.e. most distant relatedness not allowed. 5 == cousinship)
     // bool not_of_kin = alt_model ? ( false == POP_CHECK_INCEST(c, p, prohibited_degree) ) : true;
-    PLOG(LSD_VALIDATE::track_sequence(t,p,c,var).c_str());
-    PLOG("\n Caller %p %g (%s) and callee %p %g (%s)",c, UIDS(c), POP_FEMALES(c) ? "female" : "male" ,p,UID, POP_FEMALE ? "female" : "male" );
-    if (POP_FEMALE != POP_FEMALES(c)){
-    PLOG("\nTest Pot partner %g and %g.", UID, UIDS(c));
-    PLOG("\n\t is free? : %s", is_free ? "Yes" : "No"); 
-    PLOG("\n\t different sex? : %s", POP_FEMALE != POP_FEMALES(c) ? "Yes" : "No");    
-    PLOG("\n\t 2. in social distance of 1. : %s", distance < V("psearch_radius") ? "Yes" : "No");
-    PLOG("\n\t 1. in social distance of 2. : %s", distance < VS(c, "psearch_radius") ? "Yes" : "No");
-    PLOG("\n\t 2. in low age distance of 1. : %s", V("age_accept_low") <= POP_AGES(c) ? "Yes" : "No");
-    PLOG("\n\t 2. in high age distance of 1. : %s", POP_AGES(c) <= V("age_accept_high") ? "Yes" : "No");
-    PLOG("\n\t 1. in low age distance of 2. : %s", VS(c, "age_accept_low") <= POP_AGE ? "Yes" : "No");
-    PLOG("\n\t 1. in high age distance of 2. : %s", POP_AGE <= VS(c, "age_accept_high") ? "Yes" : "No");    
-    PLOG("\n\t not of kin? : %s", (alt_model ? ( false == POP_CHECK_INCEST(c, p, prohibited_degree) ) : true ) ? "Yes" : "No");
-    }
+    // PLOG(LSD_VALIDATE::track_sequence(t,p,c,var).c_str());
+    // PLOG("\n Caller %p %g (%s) and callee %p %g (%s)",c, UIDS(c), POP_FEMALES(c) ? "female" : "male" ,p,UID, POP_FEMALE ? "female" : "male" );
+    // if (POP_FEMALE != POP_FEMALES(c)){
+    // PLOG("\nTest Pot partner %g and %g.", UID, UIDS(c));
+    // PLOG("\n\t is free? : %s", is_free ? "Yes" : "No"); 
+    // PLOG("\n\t different sex? : %s", POP_FEMALE != POP_FEMALES(c) ? "Yes" : "No");    
+    // PLOG("\n\t 2. in social distance of 1. : %s", !(distance > V("psearch_radius")) ? "Yes" : "No");
+    // PLOG("\n\t 1. in social distance of 2. : %s", !(distance > VS(c, "psearch_radius")) ? "Yes" : "No");
+    // PLOG("\n\t 2. in low age distance of 1. : %s", V("age_accept_low") <= POP_AGES(c) ? "Yes" : "No");
+    // PLOG("\n\t 2. in high age distance of 1. : %s", POP_AGES(c) <= V("age_accept_high") ? "Yes" : "No");
+    // PLOG("\n\t 1. in low age distance of 2. : %s", VS(c, "age_accept_low") <= POP_AGE ? "Yes" : "No");
+    // PLOG("\n\t 1. in high age distance of 2. : %s", POP_AGE <= VS(c, "age_accept_high") ? "Yes" : "No");    
+    // PLOG("\n\t not of kin? : %s", (alt_model ? ( false == POP_CHECK_INCEST(c, p, prohibited_degree) ) : true ) ? "Yes" : "No");
+    // }
 
     if (    true == is_free //can couple
             && POP_FEMALE != POP_FEMALES(c) //different sex            
-            && distance < V("psearch_radius")  //within social/spatial range
-            && distance < VS(c, "psearch_radius")
+            && !( distance > V("psearch_radius") )  //within social/spatial range
+            && ! (distance > VS(c, "psearch_radius") )
             && V("age_accept_low") <= POP_AGES(c) //within age range
             && POP_AGES(c) <= V("age_accept_high")
             && VS(c, "age_accept_low") <= POP_AGE
@@ -621,7 +626,7 @@ double find_partner_ret = 0.0;
         }
         
         ++count;
-            if (VS(cur, "Potential_Partner") == 1.0) {
+            if (V_CHEATS(cur, "Potential_Partner",p) == 1.0) {
                 WRITE("PartnerID", UIDS(cur));
                 WRITES(cur, "PartnerID", UID);
                 PLOG("\n Matching agents %s -- %s ", POP_INFO, POP_INFOS(cur) );

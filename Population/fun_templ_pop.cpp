@@ -13,7 +13,8 @@
 // #define SWITCH_VERBOSE_OFF  //(un)comment to switch on(off)
 #define TRACK_SEQUENCE_MAX_T 1000 //number of steps for tracking
 #define SWITCH_PAJEK_OFF //(un)comment to switch on(off)
-#define SWITCH_TRACK_SEQUENCE_OFF //(un)comment to switch on(off)
+#define SWITCH_TRACK_SEQUENCE_ALL //(un)comment to switch off(on) tracking all variable calls
+#define USE_ASSERTS
 
 
 /******************************************************************************/

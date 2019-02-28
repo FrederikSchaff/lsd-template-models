@@ -13,7 +13,7 @@
 // #define SWITCH_VERBOSE_OFF  //(un)comment to switch on(off)
 #define TRACK_SEQUENCE_MAX_T 1000 //number of steps for tracking
 #define SWITCH_PAJEK_OFF //(un)comment to switch on(off)
-//#define SWITCH_TRACK_SEQUENCE_OFF //(un)comment to switch on(off)
+#define SWITCH_TRACK_SEQUENCE_OFF //(un)comment to switch on(off)
 
 
 /******************************************************************************/
@@ -26,7 +26,7 @@
 #endif
 #include "lsd-modules/pop/backend_pop_LSD.h"
 
-#define USE_LAT
+//#define USE_LAT
 
 /* -------------------------------------------------------------------------- */
 
@@ -38,7 +38,7 @@ MODELBEGIN
 /*----------------------------------------------------------------------------*/
 
 ////////////////////////
-TEQUATION("Updating_Scheme")
+EQUATION("Updating_Scheme")
 /*  Controls the flow of events at any single simulation tick. This should always
     be the first equation called in any model! */
 //TRACK_SEQUENCE
@@ -98,7 +98,7 @@ double updating_scheme_ret = 0.0;
 RESULT(updating_scheme_ret)
 
 ////////////////////////
-TEQUATION("Init_Global")
+EQUATION("Init_Global")
 /*  This it the main initialisation function, calling all initialisation action
     necessary. */
 double init_global_ret = 0.0;
@@ -106,18 +106,25 @@ double init_global_ret = 0.0;
 
     int model_type = V("Model_Type"); //allow testing different models.
     int n_generation = 0;
+    
 
     if (model_type == 1) {
         INIT_POPULATION_MODULE("BLL", 0.0, 1.0, 0.5, V("m1_alpha"), V("m1_beta")); //Model, t_start, t_unit, femaleRatio, par1, par2
         POP_SET_FAMILY_SYSTEM("Language");
-        n_generation = POP_CONSTN_BIRTH(V("Pop_const_n")); //size of the first generation
+        n_generation = POP_CONSTN_BIRTH(V("Pop_const_n")); //size of the first generation        
     }
     else {
         INIT_POPULATION_MODULE("NONE", 0.0, 1.0, 0.5); //Model, t_start, t_unit, femaleRatio
         n_generation = V("Pop_const_n") / V("m0_maxLife") * 2;
     }
 
-    INIT_SPACE_ROOT_WRAP(100, 100, 15); //initialise grid space as in BHSC The Grid Size needs to be squared, but is otherwise just a performance parameter.
+    int grid_size = max ( 10, ceil( sqrt( V("Pop_const_n")/10 ) ) ) ;
+#ifdef USE_LAT
+    grid_size = max ( 10, ceil( sqrt( V("Pop_const_n") * 10 ) ) ) ; //better visualisation
+#endif    
+    
+    PLOG("\nSelected underlying grid size is %d",grid_size);
+    INIT_SPACE_ROOT_WRAP(grid_size, grid_size, 15); //initialise grid space as in BHSC The Grid Size needs to be squared, but is otherwise just a performance parameter.
     SET_GIS_DISTANCE_TYPE('c'); //Chebychev, moore neighbourhood
 #ifdef USE_LAT
     INIT_LAT_GISS(root, 0);
@@ -135,7 +142,7 @@ RESULT(init_global_ret)
 /*           Template Model Start - see description.txt                   */
 /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
-TEQUATION("age")
+EQUATION("age")
 //TRACK_SEQUENCE
 double age_ret = 0.0;
 {
@@ -143,7 +150,7 @@ double age_ret = 0.0;
 }
 RESULT(age_ret)
 
-TEQUATION("female")
+EQUATION("female")
 //TRACK_SEQUENCE
 double female_ret = 0.0;
 {
@@ -188,7 +195,7 @@ EQUATION("nChildren")
 double nChildren_ret = POP_NCHILDREN;
 RESULT(nChildren_ret)
 
-TEQUATION("Death")
+EQUATION("Death")
 /* Kill the agent */
 //TRACK_SEQUENCE
 const double death_ret = 0.0;
@@ -198,7 +205,7 @@ const double death_ret = 0.0;
 }
 RESULT(death_ret)
 
-TEQUATION("IsFertile")
+EQUATION("IsFertile")
 /*  Determine if the agent can become a parent based on its age
     and if it is female also based on the time of the last delivery.*/
 
@@ -239,7 +246,7 @@ double isfertile_ret = 0.0;
 }
 RESULT(isfertile_ret)
 
-TEQUATION("PotentialMother")
+EQUATION("PotentialMother")
 /*  Function. Provides information on whether the women can become a mother.
     It needs to be within fertility range, have a partner within fertility range
     and the delivery of the last child needs be long enough in the past. */
@@ -256,7 +263,7 @@ double potentialMother_ret = 0.0;
 RESULT(potentialMother_ret)
 
 
-TEQUATION("Pop_birth")
+EQUATION("Pop_birth")
 /* Add next generation.*/
 double pop_birth_ret = 0;
 {
@@ -274,15 +281,14 @@ double pop_birth_ret = 0;
 
     //Add new agents
     //first: use set of potential mothers in random order
-    POP_RCYCLE_PERSON_CND(cur, 'f', V("fertility_f_low"), V("fertility_f_high"), "PotentialMother", '=', 1.0) {
+    POP_RCYCLE_PERSON_CND(cur, 'f', V("fertility_f_low"), V("fertility_f_high"), "PotentialMother", "=", 1.0) {
         if (n_generation == 0) {
             break; //done.
         }        
         V_CHEAT("Add_Agent", cur);
         --n_generation;
     }
-    PLOG("\n Total pot mothers = %g",pop_birth_ret - n_generation);
-    //second: left-overs
+        //second: left-overs
     for (int i = 0; i < n_generation; i++) {
         V_CHEAT("Add_Agent", root);
     }
@@ -291,7 +297,7 @@ double pop_birth_ret = 0;
 }
 RESULT( pop_birth_ret )
 
-TEQUATION("Add_Agent")
+EQUATION("Add_Agent")
 /*  An equation that is called via fake-caller (thus passing the mother) and creates a new agent.
     If the fake-caller is root, there are no parents.
 */
@@ -318,7 +324,16 @@ double add_agent_ret = CURRENT + 1; //#persons ever added
     
     //Add to space for wedding ring model
     if (NULL != father && NULL != mother) {
-        ADD_TO_SPACE_CENTER_SHARES(ptrAgent, mother, father);
+        double x_offset = 2*V("distance_wd");
+        if (RND > 0.5)
+            x_offset *= -1;
+        double y_offset = 2*V("distance_wd");
+        if (RND > 0.5)
+            y_offset *= -1;
+        x_offset += POSITION_XS(mother);
+        y_offset += POSITION_YS(mother);             
+               
+        ADD_TO_SPACE_XYS(ptrAgent,root, ABSOLUTE_DISTANCES(root,x_offset), ABSOLUTE_DISTANCES(root,y_offset) );
     }
     else {
         ADD_TO_SPACE_RNDS(ptrAgent, root); //Add to space at random position
@@ -336,7 +351,7 @@ double add_agent_ret = CURRENT + 1; //#persons ever added
 RESULT( add_agent_ret ) //Number of new persons created.
 
 ///////////////////////////////
-TEQUATION("Pop_age")
+EQUATION("Pop_age")
 /* Each agents get older one year. */
 //TRACK_SEQUENCE
 double pop_age_ret = CURRENT; //number of persons alive
@@ -365,7 +380,7 @@ RESULT(pop_age_ret)
 
 /***** Now the wedding ring model ****/
 
-TEQUATION("Init_Agent")
+EQUATION("Init_Agent")
 /*  Initialise a new agent
     - define agent characteristics
 */
@@ -400,7 +415,7 @@ double init_agent_ret = T;
 RESULT(init_agent_ret)
 
 
-TEQUATION("psearch_radius")
+EQUATION("psearch_radius")
 /*  This is the search radius for the partner search in the Wedding Ring model.
     It is set in 0,1 (relative)
 */
@@ -416,7 +431,7 @@ double psearch_radius_ret = 0.0;
 }
 RESULT(psearch_radius_ret)
 
-TEQUATION("age_accept_low")
+EQUATION("age_accept_low")
 /* Calculate the lower bound of acceptable age */
 double age_accept_low_ret = 0.0;
 {
@@ -428,7 +443,7 @@ double age_accept_low_ret = 0.0;
 }
 RESULT(age_accept_low_ret)
 
-TEQUATION("age_accept_high")
+EQUATION("age_accept_high")
 /* Calculate the lower bound of acceptable age */
 double age_accept_high_ret = 0.0;
 {
@@ -440,7 +455,7 @@ double age_accept_high_ret = 0.0;
 }
 RESULT(age_accept_high_ret)
 
-TEQUATION("age_influence")
+EQUATION("age_influence")
 /*  A factor that decides on the size of the socio-spatial network based on the age of the person. */
 //TRACK_SEQUENCE
 // END_EQUATION(1.0);
@@ -472,7 +487,7 @@ double age_influence_ret = 0.0;
 }
 RESULT(age_influence_ret)
 
-TEQUATION("Social_Pressure")
+EQUATION("Social_Pressure")
 /*  This is the social presure that rests upon the individual to get a partner and start getting (more) children
     At this point, the parameters alpha and beta are hard coded as in the papers [2,3], because the parameters it self are not useful to interprete.
 */
@@ -482,7 +497,7 @@ ADD_LOCAL_CLOCK_TRACKSEQUENCE
 double social_pressure_ret = 0.0;
 {
     bool alt_model = V("WD_alt_model") == 0.0 ? false : true; //define social pressure on share of people married, as in the original, or on share of people with children (true).
-    double pocm = 0.0;
+    double pocm = 0.0; // (percantage) others with children / married
     double total = 0.0;
     double age_low = POP_AGE - V("ro_a_low"); //relevant others minimum age
     double age_high = POP_AGE - V("ro_a_high");
@@ -502,10 +517,10 @@ double social_pressure_ret = 0.0;
 
         //check if putting pressure
         if (alt_model && POP_NCHILDRENS(cur) > 0 ) {
-            pocm++;
+            ++pocm; //with children
         }
         else if ( VS(cur, "Partner_Status") == 1.0 ) {
-            pocm++;
+            ++pocm; //married
         }
 
     }
@@ -513,25 +528,51 @@ double social_pressure_ret = 0.0;
     const double beta = 7.0; //V("beta_WR");
     const double alpha = 0.5;// V("alpha_WR");
     double temp = exp(beta * (pocm - alpha));
+    WRITE("nrelevant_others",pocm); //size of the set of relevant others
     social_pressure_ret = temp / (1 + temp);
-    REPORT_LOCAL_CLOCK_CND(0.02);
+    social_pressure_ret = max (social_pressure_ret , V("min_sp_wd") ); //minimum social pressure.    
 }
+REPORT_LOCAL_CLOCK_CND(0.02);
 RESULT(social_pressure_ret)
 
-TEQUATION("Statistics")
+EQUATION_DUMMY( "nrelevant_others", "Social_Pressure" ) //Make sure that Social Pressure is calculated before nrelevant_others is used.
+
+EQUATION("Statistics")
 /* Some basic cross section stats */
 double statistics_ret = 0.0;
+SET_LOCAL_CLOCK_RF
+ADD_LOCAL_CLOCK_TRACKSEQUENCE
+USE_NAN
 {
     STAT("Social_Pressure");
     WRITE("SP_avg", v[1]);
-    WRITE("SP_sd", v[4] > 0 ? sqrt(v[4]) : NaN );
+    WRITE("SP_sd", v[2] > 0 ? sqrt(v[2]) : NAN );
     WRITE("SP_max", v[3]);
     WRITE("SP_min", v[4]);
     statistics_ret = v[0];
+    
+    // STAT("AvgKinshipDegree");
+    // WRITE("AvgKinshipDegree_avg", v[1]);
+    // WRITE("AvgKinshipDegree_sd", v[2] > 0 ? sqrt(v[2]) : NAN );
+    // WRITE("AvgKinshipDegree_max", v[3]);
+    // WRITE("AvgKinshipDegree_min", v[4]);
+    
+    STAT("nChildren");
+    WRITE("nChildren_avg", v[1]);
+    WRITE("nChildren_sd", v[2] > 0 ? sqrt(v[2]) : NAN );
+    WRITE("nChildren_max", v[3]);
+    WRITE("nChildren_min", v[4]);
+    
+    STAT_CND("PartnerDegreeBlood", "PartnerID", ">", -1.0);
+    WRITE("PartnerDegreeBlood_avg", v[1]);
+    WRITE("PartnerDegreeBlood_sd", v[2] > 0 ? sqrt(v[2]) : NAN );
+    WRITE("PartnerDegreeBlood_max", v[3]);
+    WRITE("PartnerDegreeBlood_min", v[4]);
 }
+REPORT_LOCAL_CLOCK_CND(0.02);
 RESULT(statistics_ret)
 
-TEQUATION("Partner_Status")
+EQUATION("Partner_Status")
 /* Function. Is there currently a partner? 0: No, 1: Yes. Also check if partner is dead. */
 double partner_status_ret = 0.0; //no partner yet
 {
@@ -552,7 +593,7 @@ double partner_status_ret = 0.0; //no partner yet
 }
 RESULT(partner_status_ret)
 
-TEQUATION("Potential_Partner")
+EQUATION("Potential_Partner")
 /*  This is a function that reports to the caller if the callee is a suitable match,
     which implies also that the callee finds the caller suitable. */
     
@@ -600,7 +641,7 @@ double potential_partner_ret = 0.0;
 }
 RESULT(potential_partner_ret)
 
-TEQUATION("Find_Partner")
+EQUATION("Find_Partner")
 /*  If the agent does not yet have a partner, it actively searches for a partner.
     In the original wedding ring model it searches for a partner if it didn't have one yet,
     i.e., if the partner died it will still not look for a new one.
@@ -618,20 +659,42 @@ double find_partner_ret = 0.0;
 
     if (true == is_free) {
         //randomly cycle through neighbours in partner range, mating with the first one that fits.
-        int count = 0;
+        // int count = 0;              
+        
         RCYCLE_NEIGHBOUR(cur, p->label, ABSOLUTE_DISTANCE ( V("psearch_radius") ) ) { //first check distance
         if (cur == p){
             PLOG("\nSkip self. Absolute distance is %g",ABSOLUTE_DISTANCE ( V("psearch_radius")));
             continue; //skip self
         }
         
-        ++count;
+        // ++count;
+            //Found a partner!
             if (V_CHEATS(cur, "Potential_Partner",p) == 1.0) {
                 WRITE("PartnerID", UIDS(cur));
                 WRITES(cur, "PartnerID", UID);
-                PLOG("\n Matching agents %s -- %s ", POP_INFO, POP_INFOS(cur) );
-                is_free = false;
-                PLOG("\nChecked a total of %i neighbours as partner to find one",count);
+                
+                double familyDegree = POP_FAMILY_DEGREE(p,cur);
+                WRITE("PartnerDegreeBlood",familyDegree);
+                WRITES(cur,"PartnerDegreeBlood",familyDegree);
+                
+                //Move to interception
+                double size_s = V("nrelevant_others");
+                double size_o = VS(cur,"nrelevant_others");
+                double rel_pos = 0.5; //default
+                double tot = size_s + size_o;
+                if (tot > 0.0){
+                    rel_pos = size_s / tot;
+                }
+                //PLOG("\n Matching agents %s -- %s ", POP_INFO, POP_INFOS(cur) );
+                POSITION_INTERCEPT(p,cur,rel_pos); //v[0] new x, v[1] new y
+                TELEPORT_XY(v[0],v[1]);
+                TELEPORT_XYS(cur,v[0],v[1]);
+                //PLOG("\nMoved to position: %s ",GIS_INFO);
+                
+                
+                
+                //is_free = false;
+                //PLOG("\nChecked a total of %i neighbours as partner to find one",count);
                 break; //found a partner, end search
             }
         }        
@@ -642,10 +705,8 @@ REPORT_LOCAL_CLOCK_CND(0.02);
 RESULT(find_partner_ret)
 
 
-TEQUATION("AvgKinshipDegree")
+EQUATION("AvgKinshipDegree")
 /* Calculate the average Kinship Degree of the Agent with all living agents. */
-SET_LOCAL_CLOCK_RF
-ADD_LOCAL_CLOCK_TRACKSEQUENCE
 double AvgKinshipDegree_ret = 0.0;
 {
     double count;
@@ -660,7 +721,6 @@ double AvgKinshipDegree_ret = 0.0;
         AvgKinshipDegree_ret /= count;
     }
 }
-REPORT_LOCAL_CLOCK_CND(0.02);
 RESULT(AvgKinshipDegree_ret)
 
 /******************************************************************************/

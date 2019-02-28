@@ -43,7 +43,9 @@ Label Root
 		Param: tnext_pot_birth
 		Var: PotentialMother
 		Var: IsFertile
-		Var: AvgKinshipDegree
+		Param: AvgKinshipDegree
+		Param: nrelevant_others
+		Param: PartnerDegreeBlood
 
 	}
 
@@ -63,6 +65,7 @@ Label Root
 		Param: WD_alt_model
 		Param: wr_hintvl
 		Param: timeToNewBirth
+		Param: min_sp_wd
 
 	}
 
@@ -75,6 +78,18 @@ Label Root
 	Param: SP_max
 	Param: SP_min
 	Param: SP_sd
+	Param: AvgKinshipDegree_avg
+	Param: AvgKinshipDegree_max
+	Param: AvgKinshipDegree_min
+	Param: AvgKinshipDegree_sd
+	Param: nChildren_avg
+	Param: nChildren_max
+	Param: nChildren_min
+	Param: nChildren_sd
+	Param: PartnerDegreeBlood_avg
+	Param: PartnerDegreeBlood_max
+	Param: PartnerDegreeBlood_min
+	Param: PartnerDegreeBlood_sd
 
 }
 
@@ -91,22 +106,34 @@ Param: SP_avg 0 s + n n	0
 Param: SP_max 0 s + n n	0
 Param: SP_min 0 s + n n	0
 Param: SP_sd 0 s + n n	0
+Param: AvgKinshipDegree_avg 0 s + n n	0
+Param: AvgKinshipDegree_max 0 s + n n	0
+Param: AvgKinshipDegree_min 0 s + n n	0
+Param: AvgKinshipDegree_sd 0 s + n n	0
+Param: nChildren_avg 0 s + n n	0
+Param: nChildren_max 0 s + n n	0
+Param: nChildren_min 0 s + n n	0
+Param: nChildren_sd 0 s + n n	0
+Param: PartnerDegreeBlood_avg 0 s + n n	0
+Param: PartnerDegreeBlood_max 0 s + n n	0
+Param: PartnerDegreeBlood_min 0 s + n n	0
+Param: PartnerDegreeBlood_sd 0 s + n n	0
 
 Object: Pop_Model C	1
-Var: Pop_age 0 s + n p
+Var: Pop_age 0 s + n n
 Var: Pop_birth 0 s + n n
 Param: m1_alpha 0 n + n n	5.44
 Param: m1_beta 0 n + n n	-0.014729
-Param: Pop_const_n 0 s + n n	100
+Param: Pop_const_n 0 s + n n	2000
 Param: Model_Type 0 n + n n	1
 Param: m0_maxLife 0 n + n n	50
 Func: Add_Agent 0 n + n n
 Param: StorckChildRate 0 s + n n	0
 
 Object: Agent C	1
-Var: age 0 s + n n
-Var: female 0 s + n n
-Param: death_age 0 s + n n	0
+Var: age 0 n + n n
+Var: female 0 n + n n
+Param: death_age 0 n + n n	0
 Var: father 0 n + n n
 Var: mother 0 n + n n
 Func: Death 0 n + n n
@@ -124,11 +151,13 @@ Param: ro_a_high 0 n + n n	0
 Param: ro_a_low 0 n + n n	0
 Var: Find_Partner 0 n + n n
 Var: ID 0 n + n n
-Var: nChildren 0 s + n n
+Var: nChildren 0 n + n n
 Param: tnext_pot_birth 0 n + n n	0
 Var: PotentialMother 0 n + n n
 Var: IsFertile 0 n + n n
-Var: AvgKinshipDegree 0 s + n n
+Param: AvgKinshipDegree 0 n + n n	0
+Param: nrelevant_others 0 n + n n	0
+Param: PartnerDegreeBlood 0 n + n n	0
 
 Object: Settings C	1
 Param: wr_gamma 0 n + n n	2
@@ -144,6 +173,7 @@ Param: rho_WD 0 n + n n	1
 Param: WD_alt_model 0 n + n n	0
 Param: wr_hintvl 0 n + n n	2
 Param: timeToNewBirth 0 n + n n	3
+Param: min_sp_wd 0 n + n n	0.25
 
 SIM_NUM 1
 SEED 2
@@ -206,6 +236,78 @@ All 1 instances equal to 0.
 END_DESCRIPTION
 
 Parameter_SP_sd
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_AvgKinshipDegree_avg
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_AvgKinshipDegree_max
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_AvgKinshipDegree_min
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_AvgKinshipDegree_sd
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_nChildren_avg
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_nChildren_max
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_nChildren_min
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_nChildren_sd
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_PartnerDegreeBlood_avg
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_PartnerDegreeBlood_max
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_PartnerDegreeBlood_min
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Parameter_PartnerDegreeBlood_sd
 (no description available)
 _INIT_
 All 1 instances equal to 0.
@@ -430,10 +532,22 @@ _INIT_
 
 END_DESCRIPTION
 
-Variable_AvgKinshipDegree
+Parameter_AvgKinshipDegree
 'AvgKinshipDegree' appears in the equation for: (never used)
 _INIT_
 
+END_DESCRIPTION
+
+Parameter_nrelevant_others
+Size of the set of relevant others.
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_PartnerDegreeBlood
+(no description available)
+_INIT_
+All 1 instances equal to 0.
 END_DESCRIPTION
 
 Object_Settings
@@ -518,6 +632,12 @@ Parameter_timeToNewBirth
 (no description available)
 _INIT_
 All 1 instances equal to 3.
+END_DESCRIPTION
+
+Parameter_min_sp_wd
+Minimum level of social pressure.
+_INIT_
+
 END_DESCRIPTION
 
 

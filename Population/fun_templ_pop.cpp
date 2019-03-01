@@ -13,8 +13,9 @@
 // #define SWITCH_VERBOSE_OFF  //(un)comment to switch on(off)
 #define TRACK_SEQUENCE_MAX_T 1000 //number of steps for tracking
 #define SWITCH_PAJEK_OFF //(un)comment to switch on(off)
-#define SWITCH_TRACK_SEQUENCE_ALL //(un)comment to switch off(on) tracking all variable calls
-#define USE_ASSERTS
+//#define SWITCH_TRACK_SEQUENCE_ALL //(un)comment to switch off(on) tracking all variable calls
+#define DISABLE_LOCAL_CLOCKS
+//#define USE_ASSERTS
 
 
 /******************************************************************************/
@@ -525,6 +526,7 @@ double social_pressure_ret = 0.0;
         }
 
     }
+    PLOG_INFO("Total is %g",total);
 
     const double beta = 7.0; //V("beta_WR");
     const double alpha = 0.5;// V("alpha_WR");
@@ -731,7 +733,14 @@ RESULT(AvgKinshipDegree_ret)
 /* User specific below */
 
 
+EQUATION("TimeSpent")
+/* Track the simulation time for each single step. */
+if (t == 1)
+    WRITE("LastTime",clock());
 
+double delta = (double) ( clock() - V("LastTime") ) / CLOCKS_PER_SEC;
+WRITE("LastTime",clock());
+RESULT( delta )
 
 
 

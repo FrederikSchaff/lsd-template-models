@@ -90,6 +90,8 @@ Label Root
 	Param: PartnerDegreeBlood_max
 	Param: PartnerDegreeBlood_min
 	Param: PartnerDegreeBlood_sd
+	Var: TimeSpent
+	Param: LastTime
 
 }
 
@@ -118,6 +120,8 @@ Param: PartnerDegreeBlood_avg 0 s + n n	0
 Param: PartnerDegreeBlood_max 0 s + n n	0
 Param: PartnerDegreeBlood_min 0 s + n n	0
 Param: PartnerDegreeBlood_sd 0 s + n n	0
+Var: TimeSpent 0 s + n p
+Param: LastTime 0 n + n n	0
 
 Object: Pop_Model C	1
 Var: Pop_age 0 s + n n
@@ -173,11 +177,11 @@ Param: rho_WD 0 n + n n	1
 Param: WD_alt_model 0 n + n n	0
 Param: wr_hintvl 0 n + n n	2
 Param: timeToNewBirth 0 n + n n	3
-Param: min_sp_wd 0 n + n n	0.25
+Param: min_sp_wd 0 n + n n	0.05
 
 SIM_NUM 1
-SEED 2
-MAX_STEP 1000
+SEED 1
+MAX_STEP 2000
 EQUATION fun_templ_pop.cpp
 MODELREPORT report_Sim1.html
 
@@ -308,6 +312,18 @@ All 1 instances equal to 0.
 END_DESCRIPTION
 
 Parameter_PartnerDegreeBlood_sd
+(no description available)
+_INIT_
+All 1 instances equal to 0.
+END_DESCRIPTION
+
+Variable_TimeSpent
+(no description available)
+_INIT_
+
+END_DESCRIPTION
+
+Parameter_LastTime
 (no description available)
 _INIT_
 All 1 instances equal to 0.
